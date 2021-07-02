@@ -1,0 +1,12 @@
+debug/
+target/
+Cargo.lock
+**/*.rs.bk
+*.pdb
+
+
+native_language_task/debug/
+native_language_task/target/
+native_language_task/Cargo.lock
+native_language_task/**/*.rs.bk
+native_language_task/*.pdb
