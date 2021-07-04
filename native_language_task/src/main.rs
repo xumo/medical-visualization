@@ -1,71 +1,54 @@
-use crate::byteorder::ReadBytesExt;
-use byteorder::LittleEndian;
-use std::{
-    io::{Seek,SeekFrom},
-    fs::File,
-};
-extern crate byteorder;
+
+
 
 extern crate clap;
 use clap::{Arg, App};
-use std::io::prelude::*;
 
-use std::io::Cursor;
+mod volume_slicer;
+use volume_slicer::meta_data::MetaData;
+use volume_slicer::raw_parser::RawData;
+use volume_slicer::slicer::VolumeSlicer;
 
 fn main() -> std::io::Result<()> {
   let matches = App::new("Native Language Task")
               .version("1.0")
               .author("Rodrigo Torres <studio@rodrigotorres.net>")
-              .about("Slice volumen in the 3 axis")
-              .arg(Arg::with_name("info")
+              .about("Slice rawn in the 3 axis")
+              .arg(Arg::with_name("meta")
               	   .short("i")
-                   .help("Sets the info file to use")
+                   .help("Sets the meta file to use")
                    //.required(true)
                    .takes_value(true)
                    )
-              .arg(Arg::with_name("volume")
+              .arg(Arg::with_name("raw")
               	   .short("v")
-                   .help("Sets the volume raw file to use")
+                   .help("Sets the raw raw file to use")
                    //.required(true)
                    .takes_value(true)
                    )
               .get_matches();
 
 
-	let info_path = matches.value_of("info").unwrap_or("assets/sinus.mhd");
-	let volume_path = matches.value_of("volume").unwrap_or("assets/sinus.raw");
+	let meta_path = matches.value_of("meta").unwrap_or("assets/sinus.mhd");
+	let raw_path = matches.value_of("raw").unwrap_or("assets/sinus.raw");
     
-    println!("Value for info: {} volume: {}", info_path, volume_path);
+    println!("Value for meta: {} raw: {}", meta_path, raw_path);
 
-	//let info_file = File::open(info_path)?;
-	let mut volume_file = File::open(volume_path)?;
+    
+    let m_data = MetaData{
+        n_dims: 3,
+        dim_size: (512 , 512, 33),
+        element_spacing: (0.402344, 0.402344, 0.899994)
+    };
 
-
-	let len = volume_file.seek(SeekFrom::End(0))?;
-    println!("The file is currently {} bytes long", len);
-
-
-    volume_file.seek( SeekFrom::Start( 0 ) )?;
-
-
-     let mut buffer = Vec::new();
-    // read the whole file
-    volume_file.read_to_end(&mut buffer)?;
-    //buf_reader.read_u16_into::<LittleEndian>(&mut buffer[..]).unwrap();
-   
-    let len2 = buffer.len(); 
-
-    let mut vec_pointer = Cursor::new(buffer);
+    let raw_data = RawData::parse(raw_path.to_string())?;
+    
+    let slicer = VolumeSlicer::new(m_data);
 
 
+    slicer.slice(raw_data.get_data());
 
-    for _index in 0..(len2 / 2 - 1) {
-        vec_pointer.seek(SeekFrom::Current(2))?;
-        let val = vec_pointer.read_u16::<LittleEndian>().unwrap();
-        println!("value \t\t {} ", val);
-        //val = val >> 4;
-        //println!("recorrido \t {} ", val);
-    }
+
 
 	Ok(())
 
