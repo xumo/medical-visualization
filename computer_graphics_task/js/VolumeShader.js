@@ -182,8 +182,8 @@ var VolumeRenderShader1 = {
 		//
 		'		void cast_avg(vec3 start_loc, vec3 step, int nsteps, vec3 view_ray) {',
 
-		'				float max_val = -1e6;',
-		'				int max_i = 100;',
+		'				float max_val = 0.0;',
+		'				float max_i = 1.0;',
 		'				vec3 loc = start_loc;',
 
 		// Enter the raycasting loop. In WebGL 1 the loop index cannot be compared with
@@ -195,24 +195,23 @@ var VolumeRenderShader1 = {
 		// Sample from the 3D texture
 		'						float val = sample1(loc);',
 		// Apply MIP operation
-		'						if (val > max_val) {',
-		'								max_val = val;',
-		'								max_i = iter;',
-		'						}',
+		'						',
+		'						max_val += val;',
+		'						max_i ++;',
 		// Advance location deeper into the volume
 		'						loc += step;',
 		'				}',
 
 		// Refine location, gives crispier images
-		'				vec3 iloc = start_loc + step * (float(max_i) - 0.5);',
-		'				vec3 istep = step / float(REFINEMENT_STEPS);',
-		'				for (int i=0; i<REFINEMENT_STEPS; i++) {',
-		'						max_val = max(max_val, sample1(iloc));',
-		'						iloc += istep;',
-		'				}',
+		'				// vec3 iloc = start_loc + step * (float(max_i) - 0.5);',
+		'				// vec3 istep = step / float(REFINEMENT_STEPS);',
+		'				// for (int i=0; i<REFINEMENT_STEPS; i++) {',
+		'				// 		max_val = max(max_val, sample1(iloc));',
+		'				// 		iloc += istep;',
+		'				// }',
 
 		// Resolve final color
-		'				gl_FragColor = apply_colormap(max_val);',
+		'				gl_FragColor = apply_colormap(max_val / max_i);',
 		'		}',
 
 		'		void cast_iso(vec3 start_loc, vec3 step, int nsteps, vec3 view_ray) {',
