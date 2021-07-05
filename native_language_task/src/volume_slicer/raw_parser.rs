@@ -1,11 +1,9 @@
 
-use std::io::Cursor;
+
 use std::io::prelude::*;
-extern crate byteorder;
-use byteorder::LittleEndian;
-use byteorder::ReadBytesExt;
+
+
 use std::{
-    io::{Seek,SeekFrom},
     fs::File,
 };
 
@@ -24,8 +22,6 @@ impl RawData{
 	    let mut buffer = Vec::new();
 	    raw_file.read_to_end(&mut buffer)?;
 	    
-	    let len = buffer.len(); 
-		println!("Buffer length \t {} ", len);
 	   
 	   Ok( RawData{
 	    	data: buffer

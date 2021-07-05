@@ -30,27 +30,21 @@ fn main() -> std::io::Result<()> {
 	let meta_path = matches.value_of("meta").unwrap_or("assets/sinus.mhd");
 	let raw_path = matches.value_of("raw").unwrap_or("assets/sinus.raw");
     
-    println!("Value for meta: {} raw: {}", meta_path, raw_path);
-
+    println!("Using files\n----------- \nmeta data: {} \nraw volume: {}", meta_path, raw_path);
     
-    let m_data = MetaData{
-        n_dims: 3,
-        dim_size: (512 , 512, 333),
-        element_spacing: (0.402344, 0.402344, 0.899994)
-    };
-
+    let m_data = MetaData::parse(meta_path.to_string())?;
     let raw_data = RawData::parse(raw_path.to_string())?;
     
     let slicer = VolumeSlicer::new(m_data);
 
 
-    let buffer_x = slicer.slice_middle(raw_data.get_data(), Axis::X);
-    let buffer_y = slicer.slice_middle(raw_data.get_data(), Axis::Y);
-    let buffer_z = slicer.slice_middle(raw_data.get_data(), Axis::Z);
+    let image_buffer_x = slicer.slice_middle(raw_data.get_data(), Axis::X);
+    let image_buffer_y = slicer.slice_middle(raw_data.get_data(), Axis::Y);
+    let image_buffer_z = slicer.slice_middle(raw_data.get_data(), Axis::Z);
 
-    image::save_buffer("images/slice_x.png", &buffer_x, 512, 333, image::ColorType::L8).unwrap();
-    image::save_buffer("images/slice_y.png", &buffer_y, 512, 333, image::ColorType::L8).unwrap();
-    image::save_buffer("images/slice_z.png", &buffer_z, 512, 512, image::ColorType::L8).unwrap();
+    image::save_buffer("images/slice_x.png", &image_buffer_x, 512, 333, image::ColorType::L8).unwrap();
+    image::save_buffer("images/slice_y.png", &image_buffer_y, 512, 333, image::ColorType::L8).unwrap();
+    image::save_buffer("images/slice_z.png", &image_buffer_z, 512, 512, image::ColorType::L8).unwrap();
 
 
 	Ok(())

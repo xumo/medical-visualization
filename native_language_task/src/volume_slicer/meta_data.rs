@@ -6,12 +6,12 @@ pub struct MetaData {
 }
 
 impl MetaData{
-	// Another static method, taking two arguments:
-    pub fn parse(file_path: String) -> std::io::Result<MetaData> {
+	// TODO actually parse file
+    pub fn parse(_file_path: String) -> std::io::Result<MetaData> {
         
     	let _m_data = MetaData{
 	        n_dims: 3,
-	        dim_size: (512 , 512, 33),
+	        dim_size: (512 , 512, 333),
 	        element_spacing: (0.402344, 0.402344, 0.899994)
 	    };
 
@@ -19,5 +19,5 @@ impl MetaData{
     }
 
 
-    
+
 }
