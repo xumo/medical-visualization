@@ -16,7 +16,13 @@ var VolumeRenderShader1 = {
 		'u_renderthreshold': { value: 0.5 },
 		'u_clim': { value: new Vector2( 1, 1 ) },
 		'u_data': { value: null },
-		'u_cmdata': { value: null }
+		'u_cmdata': { value: null },
+		'u_min_x': { value: 0.0},
+		'u_max_x': { value: 1.0},
+		'u_min_y': { value: 0.0},
+		'u_max_y': { value: 1.0},
+		'u_min_z': { value: 0.0},
+		'u_max_z': { value: 1.0},
 	},
 	vertexShader: [
 		'		varying vec4 v_nearpos;',
@@ -57,6 +63,14 @@ var VolumeRenderShader1 = {
 		'		uniform int u_renderstyle;',
 		'		uniform float u_renderthreshold;',
 		'		uniform vec2 u_clim;',
+
+		'		uniform float u_min_x;', 
+		'		uniform float u_max_x;', 
+		'		uniform float u_min_y;', 
+		'		uniform float u_max_y;', 
+		'		uniform float u_min_z;', 
+		'		uniform float u_max_z;', 
+
 
 		'		uniform sampler3D u_data;',
 		'		uniform sampler2D u_cmdata;',
@@ -133,6 +147,11 @@ var VolumeRenderShader1 = {
 
 		'		float sample1(vec3 texcoords) {',
 		'				/* Sample float value from a 3D texture. Assumes intensity data. */',
+
+		'				if(texcoords.x < u_min_x || texcoords.x > u_max_x) { return 0.0;};',
+		'				if(texcoords.y < u_min_y || texcoords.y > u_max_y) { return 0.0;};',
+		'				if(texcoords.z < u_min_z || texcoords.z > u_max_z) { return 0.0;};',
+
 		'				return texture(u_data, texcoords.xyz).r;',
 		'		}',
 
@@ -201,14 +220,6 @@ var VolumeRenderShader1 = {
 		// Advance location deeper into the volume
 		'						loc += step;',
 		'				}',
-
-		// Refine location, gives crispier images
-		'				// vec3 iloc = start_loc + step * (float(max_i) - 0.5);',
-		'				// vec3 istep = step / float(REFINEMENT_STEPS);',
-		'				// for (int i=0; i<REFINEMENT_STEPS; i++) {',
-		'				// 		max_val = max(max_val, sample1(iloc));',
-		'				// 		iloc += istep;',
-		'				// }',
 
 		// Resolve final color
 		'				gl_FragColor = apply_colormap(max_val / max_i);',

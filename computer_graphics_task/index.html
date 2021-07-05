@@ -1,7 +1,7 @@
 	<!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>three.js webgl - volume rendering example</title>
+	<title>Rodigo Torres - Task 2</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	<link type="text/css" rel="stylesheet" href="main.css">
@@ -9,7 +9,7 @@
 
 <body>
 	<div id="info">
-		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Float volume render test (mip / isosurface)
+		<a href="https://rodrigotorres.net" target="_blank" rel="noopener">Rodrigo Torres</a> - Medical Visualization Exercise - Task 2
 	</div>
 	<div id="inset"></div>
 
@@ -69,13 +69,30 @@
 			// let dirLight = new DirectionalLight( 0xffffff );
 
 			// The gui for interaction
-			volconfig = { clim1: 0, clim2: 1, renderstyle: 'avg', isothreshold: 0.15, colormap: 'viridis' };
+			volconfig = { clim1: 0
+				, clim2: 0.1
+				, renderstyle: 'avg'
+				, isothreshold: 0.15
+				, colormap: 'viridis'
+				, minX: 0.0
+				, maxX: 1.0 
+				, minY: 0.0
+				, maxY: 1.0 
+				, minZ: 0.0
+				, maxZ: 1.0 };
 			const gui = new GUI();
 			gui.add( volconfig, 'clim1', 0, 1, 0.01 ).onChange( updateUniforms );
 			gui.add( volconfig, 'clim2', 0, 1, 0.01 ).onChange( updateUniforms );
 			gui.add( volconfig, 'colormap', { gray: 'gray', viridis: 'viridis' } ).onChange( updateUniforms );
 			gui.add( volconfig, 'renderstyle', { avg: 'avg', mip: 'mip', iso: 'iso'  } ).onChange( updateUniforms );
 			gui.add( volconfig, 'isothreshold', 0, 1, 0.01 ).onChange( updateUniforms );
+
+			gui.add( volconfig, 'minX', 0, 1, 0.01 ).onChange( updateUniforms );
+			gui.add( volconfig, 'maxX', 0, 1, 0.01 ).onChange( updateUniforms );
+			gui.add( volconfig, 'minY', 0, 1, 0.01 ).onChange( updateUniforms );
+			gui.add( volconfig, 'maxY', 0, 1, 0.01 ).onChange( updateUniforms );
+			gui.add( volconfig, 'minZ', 0, 1, 0.01 ).onChange( updateUniforms );
+			gui.add( volconfig, 'maxZ', 0, 1, 0.01 ).onChange( updateUniforms );
 
 			// Load the data ...
 			new NRRDLoader().load( "models/nrrd/stent.nrrd", function ( volume ) {
@@ -100,7 +117,7 @@
 				const shader = VolumeRenderShader1;
 
 				const uniforms = THREE.UniformsUtils.clone( shader.uniforms );
-
+				console.log(volume.xLength, volume.yLength, volume.zLength);
 				uniforms[ "u_data" ].value = texture;
 				uniforms[ "u_size" ].value.set( volume.xLength, volume.yLength, volume.zLength );
 				uniforms[ "u_clim" ].value.set( volconfig.clim1, volconfig.clim2 );
@@ -138,6 +155,14 @@
 			material.uniforms[ "u_renderstyle" ].value = style; // 0: MIP, 1: ISO
 			material.uniforms[ "u_renderthreshold" ].value = volconfig.isothreshold; // For ISO renderstyle
 			material.uniforms[ "u_cmdata" ].value = cmtextures[ volconfig.colormap ];
+
+
+			material.uniforms["u_min_x"].value = volconfig.minX < volconfig.maxX ? volconfig.minX :  volconfig.maxX ;
+			material.uniforms["u_max_x"].value = volconfig.minX > volconfig.maxX ? volconfig.minX :  volconfig.maxX ;
+			material.uniforms["u_min_y"].value = volconfig.minY < volconfig.maxY ? volconfig.minY :  volconfig.maxY ;
+			material.uniforms["u_max_y"].value = volconfig.minY > volconfig.maxY ? volconfig.minY :  volconfig.maxY ;
+			material.uniforms["u_min_z"].value = volconfig.minZ < volconfig.maxZ ? volconfig.minZ :  volconfig.maxZ ;
+			material.uniforms["u_max_z"].value = volconfig.minZ > volconfig.maxZ ? volconfig.minZ :  volconfig.maxZ ;
 
 			render();
 
