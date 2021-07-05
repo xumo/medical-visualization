@@ -1,13 +1,11 @@
-
-
-
 extern crate clap;
+extern crate image;
 use clap::{Arg, App};
 
 mod volume_slicer;
 use volume_slicer::meta_data::MetaData;
 use volume_slicer::raw_parser::RawData;
-use volume_slicer::slicer::VolumeSlicer;
+use volume_slicer::slicer::{VolumeSlicer, Axis};
 
 fn main() -> std::io::Result<()> {
   let matches = App::new("Native Language Task")
@@ -37,7 +35,7 @@ fn main() -> std::io::Result<()> {
     
     let m_data = MetaData{
         n_dims: 3,
-        dim_size: (512 , 512, 33),
+        dim_size: (512 , 512, 333),
         element_spacing: (0.402344, 0.402344, 0.899994)
     };
 
@@ -46,8 +44,13 @@ fn main() -> std::io::Result<()> {
     let slicer = VolumeSlicer::new(m_data);
 
 
-    slicer.slice(raw_data.get_data());
+    let buffer_x = slicer.slice_middle(raw_data.get_data(), Axis::X);
+    let buffer_y = slicer.slice_middle(raw_data.get_data(), Axis::Y);
+    let buffer_z = slicer.slice_middle(raw_data.get_data(), Axis::Z);
 
+    image::save_buffer("images/slice_x.png", &buffer_x, 512, 333, image::ColorType::L8).unwrap();
+    image::save_buffer("images/slice_y.png", &buffer_y, 512, 333, image::ColorType::L8).unwrap();
+    image::save_buffer("images/slice_z.png", &buffer_z, 512, 512, image::ColorType::L8).unwrap();
 
 
 	Ok(())

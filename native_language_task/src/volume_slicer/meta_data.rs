@@ -1,7 +1,7 @@
 #[derive(Debug)]
 pub struct MetaData {
-	pub n_dims: u32,
-	pub dim_size: (u32, u32, u32),
+	pub n_dims: usize,
+	pub dim_size: (usize, usize, usize),
 	pub element_spacing: (f32, f32, f32),
 }
 
