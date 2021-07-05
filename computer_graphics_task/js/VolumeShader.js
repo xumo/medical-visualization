@@ -76,6 +76,7 @@ var VolumeRenderShader1 = {
 
 		'		void cast_mip(vec3 start_loc, vec3 step, int nsteps, vec3 view_ray);',
 		'		void cast_iso(vec3 start_loc, vec3 step, int nsteps, vec3 view_ray);',
+		'		void cast_avg(vec3 start_loc, vec3 step, int nsteps, vec3 view_ray);',
 
 		'		float sample1(vec3 texcoords);',
 		'		vec4 apply_colormap(float val);',
@@ -122,6 +123,8 @@ var VolumeRenderShader1 = {
 		'						cast_mip(start_loc, step, nsteps, view_ray);',
 		'				else if (u_renderstyle == 1)',
 		'						cast_iso(start_loc, step, nsteps, view_ray);',
+		'				else if (u_renderstyle == 2)',
+		'						cast_avg(start_loc, step, nsteps, view_ray);',
 
 		'				if (gl_FragColor.a < 0.05)',
 		'						discard;',
@@ -174,7 +177,43 @@ var VolumeRenderShader1 = {
 		// Resolve final color
 		'				gl_FragColor = apply_colormap(max_val);',
 		'		}',
+		
+		//	Average by Rodrigo Torres 
+		//
+		'		void cast_avg(vec3 start_loc, vec3 step, int nsteps, vec3 view_ray) {',
 
+		'				float max_val = -1e6;',
+		'				int max_i = 100;',
+		'				vec3 loc = start_loc;',
+
+		// Enter the raycasting loop. In WebGL 1 the loop index cannot be compared with
+		// non-constant expression. So we use a hard-coded max, and an additional condition
+		// inside the loop.
+		'				for (int iter=0; iter<MAX_STEPS; iter++) {',
+		'						if (iter >= nsteps)',
+		'								break;',
+		// Sample from the 3D texture
+		'						float val = sample1(loc);',
+		// Apply MIP operation
+		'						if (val > max_val) {',
+		'								max_val = val;',
+		'								max_i = iter;',
+		'						}',
+		// Advance location deeper into the volume
+		'						loc += step;',
+		'				}',
+
+		// Refine location, gives crispier images
+		'				vec3 iloc = start_loc + step * (float(max_i) - 0.5);',
+		'				vec3 istep = step / float(REFINEMENT_STEPS);',
+		'				for (int i=0; i<REFINEMENT_STEPS; i++) {',
+		'						max_val = max(max_val, sample1(iloc));',
+		'						iloc += istep;',
+		'				}',
+
+		// Resolve final color
+		'				gl_FragColor = apply_colormap(max_val);',
+		'		}',
 
 		'		void cast_iso(vec3 start_loc, vec3 step, int nsteps, vec3 view_ray) {',
 
