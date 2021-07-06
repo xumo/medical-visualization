@@ -19,7 +19,7 @@ fn main() -> std::io::Result<()> {
                    .takes_value(true)
                    )
               .arg(Arg::with_name("raw")
-              	   .short("v")
+              	   .short("r")
                    .help("Sets the raw raw file to use")
                    //.required(true)
                    .takes_value(true)
