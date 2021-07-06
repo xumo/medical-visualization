@@ -32,10 +32,10 @@ fn main() -> std::io::Result<()> {
     
     println!("Using files\n----------- \nmeta data: {} \nraw volume: {}", meta_path, raw_path);
     
-    let m_data = MetaData::parse(meta_path.to_string())?;
+    let meta_data = MetaData::parse(meta_path.to_string())?;
     let raw_data = RawData::parse(raw_path.to_string())?;
     
-    let slicer = VolumeSlicer::new(m_data);
+    let slicer = VolumeSlicer::new(meta_data);
 
 
     let image_buffer_x = slicer.slice_middle(raw_data.get_data(), Axis::X);

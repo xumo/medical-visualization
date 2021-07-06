@@ -6,7 +6,7 @@ pub struct MetaData {
 }
 
 impl MetaData{
-	// TODO actually parse file
+	// TODO actually parse a file
     pub fn parse(_file_path: String) -> std::io::Result<MetaData> {
         
     	let _m_data = MetaData{
@@ -18,6 +18,16 @@ impl MetaData{
 	    Ok(_m_data)
     }
 
+    pub fn width(&self) -> usize{
+    	self.dim_size.0
+    }
 
+    pub fn height(&self) -> usize{
+    	self.dim_size.1
+    }
+
+    pub fn depth(&self) -> usize{
+    	self.dim_size.2
+    }
 
 }
